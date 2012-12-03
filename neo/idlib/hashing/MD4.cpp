@@ -1,5 +1,7 @@
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../precompiled.h"
 
 /*

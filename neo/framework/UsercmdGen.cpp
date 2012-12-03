@@ -27,7 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "../idlib/precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 idCVar joy_mergedThreshold( "joy_mergedThreshold", "1", CVAR_BOOL | CVAR_ARCHIVE, "If the thresholds aren't merged, you drift more off center" );
 idCVar joy_newCode( "joy_newCode", "1", CVAR_BOOL | CVAR_ARCHIVE, "Use the new codepath" );

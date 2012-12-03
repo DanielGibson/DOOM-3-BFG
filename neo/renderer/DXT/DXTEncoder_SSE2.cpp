@@ -30,7 +30,9 @@ If you have questions concerning this license or the applicable additional terms
 Contains the DxtEncoder implementation for SSE2.
 ================================================================================================
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "DXTCodec_local.h"
 #include "DXTCodec.h"
 

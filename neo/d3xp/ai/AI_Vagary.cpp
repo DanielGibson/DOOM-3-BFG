@@ -33,7 +33,9 @@ Vagary specific AI code
 
 ***********************************************************************/
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 
 

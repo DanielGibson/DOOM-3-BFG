@@ -40,7 +40,9 @@ If you have questions concerning this license or the applicable additional terms
 ** Note that the GLW_xxx functions are Windows specific GL-subsystem
 ** related functions that are relevant ONLY to win_glimp.c
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 
 #include "win_local.h"

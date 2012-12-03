@@ -13,7 +13,9 @@ Contains the windows implementation of the network session
 ================================================================================================
 */
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 #include "../../framework/Common_local.h"
 #include "../sys_session_local.h"

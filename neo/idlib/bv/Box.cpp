@@ -26,7 +26,9 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../precompiled.h"
 
 idBox box_zero( vec3_zero, vec3_zero, mat3_identity );

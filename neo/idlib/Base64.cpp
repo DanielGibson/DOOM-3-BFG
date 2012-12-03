@@ -1,6 +1,8 @@
 
 #include "precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 /*
 Copyright (c) 1996 Lars Wirzenius.  All rights reserved.

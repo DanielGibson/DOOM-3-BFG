@@ -25,9 +25,13 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../idlib/precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "PlayerProfile.h"
 
 // After releasing a version to the market, here are limitations for compatibility:

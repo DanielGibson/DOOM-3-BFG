@@ -25,7 +25,9 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../idlib/precompiled.h"
 
 idCVar net_verboseSnapshot( "net_verboseSnapshot", "0", CVAR_INTEGER | CVAR_NOCHEAT, "Verbose snapshot code to help debug snapshot problems. Greater the number greater the spam" );

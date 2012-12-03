@@ -27,7 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "../idlib/precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 idCVar binaryLoadParticles( "binaryLoadParticles", "1", 0, "enable binary load/write of particle decls" );
 

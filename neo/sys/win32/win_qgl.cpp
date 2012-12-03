@@ -35,7 +35,9 @@ If you have questions concerning this license or the applicable additional terms
 ** QGL_Init() - loads libraries, assigns function pointers, etc.
 ** QGL_Shutdown() - unloads libraries, NULLs function pointers
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 
 #include <float.h>

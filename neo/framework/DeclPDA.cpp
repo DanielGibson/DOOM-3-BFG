@@ -27,7 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "../idlib/precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 idCVar g_useOldPDAStrings( "g_useOldPDAStrings", "0", CVAR_BOOL, "Read strings from the .pda files rather than from the .lang file" );
 

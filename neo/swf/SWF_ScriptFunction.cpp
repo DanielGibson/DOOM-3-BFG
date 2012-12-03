@@ -25,7 +25,9 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../idlib/precompiled.h"
 
 idCVar swf_debug( "swf_debug", "0", CVAR_INTEGER | CVAR_ARCHIVE, "debug swf scripts.  1 shows traces/errors.  2 also shows warnings.  3 also shows disassembly.  4 shows parameters in the disassembly." );

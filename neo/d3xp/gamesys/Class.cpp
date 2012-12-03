@@ -32,7 +32,9 @@ instancing of objects.
 
 */
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 
 

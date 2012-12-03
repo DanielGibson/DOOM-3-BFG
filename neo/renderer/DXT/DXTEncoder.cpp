@@ -31,7 +31,9 @@ Contains the DxtEncoder implementation.
 ================================================================================================
 */
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "DXTCodec_local.h"
 #include "DXTCodec.h"
 

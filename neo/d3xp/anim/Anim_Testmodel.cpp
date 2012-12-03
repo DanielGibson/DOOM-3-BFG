@@ -48,7 +48,9 @@ move around it to view it from different angles.
 =============================================================================
 */
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 
 

@@ -25,7 +25,9 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../idlib/precompiled.h"
 
 idCVar com_requireNonProductionSignIn( "com_requireNonProductionSignIn", "1", CVAR_BOOL | CVAR_ARCHIVE, "If true, will require sign in, even on non production builds." );

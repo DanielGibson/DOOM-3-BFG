@@ -28,7 +28,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "../idlib/precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 #include "Unzip.h"
 #include "Zip.h"

@@ -27,7 +27,9 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 #ifdef USE_STRING_DATA_ALLOCATOR
 static idDynamicBlockAlloc < char, 1 << 18, 128, TAG_STRING >	stringDataAllocator;

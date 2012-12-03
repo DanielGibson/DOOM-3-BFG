@@ -32,7 +32,9 @@ Event are used for scheduling tasks and for linking script commands.
 
 */
 
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 #include "../../idlib/precompiled.h"
 
 

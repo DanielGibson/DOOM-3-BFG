@@ -32,7 +32,9 @@ Various utility objects and functions.
 */
 
 #include "../idlib/precompiled.h"
+#ifdef _MSC_VER
 #pragma hdrstop
+#endif
 
 #include "Game_local.h"
 
