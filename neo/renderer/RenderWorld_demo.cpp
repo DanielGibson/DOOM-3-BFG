@@ -327,7 +327,8 @@ void	idRenderWorldLocal::WriteVisibleDefs( const viewDef_t* viewDef )
 	{
 		idRenderEntityLocal* ent = viewEnt->entityDef;
 		
-		if( ent->archived )
+		// DG: add check for ent == NULL - happens if the viewEntity_t is from idGuiModel::EmitSurfaces()
+		if( ent == NULL || ent->archived )
 		{
 			// still up to date
 			continue;

@@ -114,6 +114,8 @@ void idGuiModel::EmitSurfaces( float modelMatrix[16], float modelViewMatrix[16],
 	guiSpace->weaponDepthHack = depthHack;
 	guiSpace->isGuiSurface = true;
 	
+	// DG: FIXME: entityDef NULL?
+
 	// If this is an in-game gui, we need to be able to find the matrix again for head mounted
 	// display bypass matrix fixup.
 	if( linkAsEntity )
