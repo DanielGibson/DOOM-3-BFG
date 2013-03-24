@@ -94,7 +94,7 @@ a thread has reached a specific point.
 ================================================
 */
 // RB begin
-#if defined(_WIN32)
+#if 1 //defined(_WIN32)
 class idSysSignal
 {
 public:

@@ -8,6 +8,8 @@ if(MSVC)
 	list(REMOVE_ITEM ID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/posix_thread.cpp)	
 else()
 	list(REMOVE_ITEM ID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/win32/win_thread.cpp)
+	# FIXME: next line...
+	list(REMOVE_ITEM ID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/posix_thread.cpp)
 endif()
 
 #if(STANDALONE)
@@ -48,6 +50,18 @@ else()
 	endforeach()
 	
 	include_directories(.)
+	
+	if(UNIX)
+		if(SDL2)
+			#find_package(SDL2 REQUIRED)
+			include_directories(${SDL2_INCLUDE_DIR})
+			#set(SDLx_LIBRARY ${SDL2_LIBRARY})
+		else()
+			#find_package(SDL REQUIRED)
+			include_directories(${SDL_INCLUDE_DIR})
+			#set(SDLx_LIBRARY ${SDL_LIBRARY})
+		endif()
+	endif()
 	
 	# precompiled magic for GCC/clang, adapted from https://gist.github.com/573926
 	STRING(TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _flags_var_name)

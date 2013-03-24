@@ -31,6 +31,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #ifndef __TYPEINFOGEN__
 
+#ifndef _WIN32
+#include <SDL_mutex.h>
+#endif
+
 /*
 ================================================================================================
 
@@ -45,8 +49,21 @@ typedef CRITICAL_SECTION		mutexHandle_t;
 typedef HANDLE					signalHandle_t;
 typedef LONG					interlockedInt_t;
 #else
-typedef pthread_mutex_t			mutexHandle_t;
-typedef pthread_cond_t			signalHandle_t;
+
+struct signalHandle_t {
+	// all this stuff is needed to emulate Window's Event API
+	// (CreateEvent(), SetEvent(), WaitForSingleObject(), ...)
+	SDL_cond* cond;
+	SDL_mutex* mutex;
+	int waiting; // number of threads waiting for a signal
+	bool manualReset;
+	bool signaled; // is it signaled right now?
+};
+
+//typedef pthread_mutex_t			mutexHandle_t;
+typedef SDL_mutex*			mutexHandle_t;
+//typedef SDL_semaphore*			mutexHandle_t;
+//typedef pthread_cond_t			signalHandle_t;
 typedef int						interlockedInt_t;
 #endif
 // RB end
@@ -196,7 +213,7 @@ void				Sys_DestroyThread( uintptr_t threadHandle );
 void				Sys_SetCurrentThreadName( const char* name );
 
 // use alternative pthread implementation in idSysSignal
-#if defined(_WIN32)
+#if 1 //defined(_WIN32)
 void				Sys_SignalCreate( signalHandle_t& handle, bool manualReset );
 void				Sys_SignalDestroy( signalHandle_t& handle );
 void				Sys_SignalRaise( signalHandle_t& handle );
