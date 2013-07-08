@@ -106,7 +106,7 @@ viewEntity_t* R_SetEntityDefViewEntity( idRenderEntityLocal* def )
 	def->viewCount = tr.viewCount;
 	
 	viewEntity_t* vModel = ( viewEntity_t* )R_ClearedFrameAlloc( sizeof( *vModel ), FRAME_ALLOC_VIEW_ENTITY );
-	assert(def != NULL); // DG
+	assert( def != NULL ); // DG
 	vModel->entityDef = def;
 	
 	// the scissorRect will be expanded as the model bounds is accepted into visible portal chains

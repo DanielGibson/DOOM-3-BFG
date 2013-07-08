@@ -152,11 +152,15 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile* readDemo, renderView_t
 			for( int i = 0; i < MAX_GLOBAL_SHADER_PARMS; i++ )
 				readDemo->ReadFloat( renderView->shaderParms[i] );
 				
-			if( !readDemo->ReadInt( ( int& )renderView->globalMaterial ) )
+			if( !readDemo->ReadFakePtr( renderView->globalMaterial ) )
 			{
+				renderView->globalMaterial = NULL;
 				return false;
 			}
 			
+			// make sure it doesn't point into the void
+			renderView->globalMaterial = NULL;
+
 			if( r_showDemo.GetBool() )
 			{
 				common->Printf( "DC_RENDERVIEW: %i\n", renderView->time );
@@ -387,7 +391,8 @@ void	idRenderWorldLocal::WriteRenderView( const renderView_t* renderView )
 	common->WriteDemo()->WriteInt( renderView->time[1] );
 	for( i = 0; i < MAX_GLOBAL_SHADER_PARMS; i++ )
 		common->WriteDemo()->WriteFloat( renderView->shaderParms[i] );
-	common->WriteDemo()->WriteInt( ( int& )renderView->globalMaterial );
+		
+	common->WriteDemo()->WriteFakePtr( renderView->globalMaterial );
 	
 	if( r_showDemo.GetBool() )
 	{
@@ -479,12 +484,14 @@ void	idRenderWorldLocal::WriteRenderLight( qhandle_t handle, const renderLight_t
 	common->WriteDemo()->WriteVec3( light->up );
 	common->WriteDemo()->WriteVec3( light->start );
 	common->WriteDemo()->WriteVec3( light->end );
-	common->WriteDemo()->WriteInt( ( int& )light->prelightModel );
+	// DG: use WriteFakePtr for pointers
+	common->WriteDemo()->WriteFakePtr( light->prelightModel );
 	common->WriteDemo()->WriteInt( light->lightId );
-	common->WriteDemo()->WriteInt( ( int& )light->shader );
+	common->WriteDemo()->WriteFakePtr( light->shader );
 	for( int i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ )
 		common->WriteDemo()->WriteFloat( light->shaderParms[i] );
-	common->WriteDemo()->WriteInt( ( int& )light->referenceSound );
+	common->WriteDemo()->WriteFakePtr( light->referenceSound );
+	// DG end
 	
 	if( light->prelightModel )
 	{
@@ -537,12 +544,14 @@ void	idRenderWorldLocal::ReadRenderLight( )
 	common->ReadDemo()->ReadVec3( light.up );
 	common->ReadDemo()->ReadVec3( light.start );
 	common->ReadDemo()->ReadVec3( light.end );
-	common->ReadDemo()->ReadInt( ( int& )light.prelightModel );
+	// DG: using ReadFakePtr() instead of ReadInt() to get information if ppinters were NULL
+	common->ReadDemo()->ReadFakePtr( light.prelightModel );
 	common->ReadDemo()->ReadInt( light.lightId );
-	common->ReadDemo()->ReadInt( ( int& )light.shader );
+	common->ReadDemo()->ReadFakePtr( light.shader );
 	for( int i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ )
 		common->ReadDemo()->ReadFloat( light.shaderParms[i] );
-	common->ReadDemo()->ReadInt( ( int& )light.referenceSound );
+	common->ReadDemo()->ReadFakePtr( light.referenceSound );
+	// DG end
 	if( light.prelightModel )
 	{
 		light.prelightModel = renderModelManager->FindModel( common->ReadDemo()->ReadHashString() );
@@ -585,30 +594,30 @@ void	idRenderWorldLocal::WriteRenderEntity( qhandle_t handle, const renderEntity
 	common->WriteDemo()->WriteInt( DC_UPDATE_ENTITYDEF );
 	common->WriteDemo()->WriteInt( handle );
 	
-	common->WriteDemo()->WriteInt( ( int& )ent->hModel );
+	// DG: replaced WriteInt() hackery with pointers with WriteFakePtr()
+	common->WriteDemo()->WriteFakePtr( ent->hModel );
 	common->WriteDemo()->WriteInt( ent->entityNum );
 	common->WriteDemo()->WriteInt( ent->bodyId );
 	common->WriteDemo()->WriteVec3( ent->bounds[0] );
 	common->WriteDemo()->WriteVec3( ent->bounds[1] );
-	common->WriteDemo()->WriteInt( ( int& )ent->callback );
-	common->WriteDemo()->WriteInt( ( int& )ent->callbackData );
+	// DG: don't save the ent->callback* stuff, it's set to NULL on read anyway..
 	common->WriteDemo()->WriteInt( ent->suppressSurfaceInViewID );
 	common->WriteDemo()->WriteInt( ent->suppressShadowInViewID );
 	common->WriteDemo()->WriteInt( ent->suppressShadowInLightID );
 	common->WriteDemo()->WriteInt( ent->allowSurfaceInViewID );
 	common->WriteDemo()->WriteVec3( ent->origin );
 	common->WriteDemo()->WriteMat3( ent->axis );
-	common->WriteDemo()->WriteInt( ( int& )ent->customShader );
-	common->WriteDemo()->WriteInt( ( int& )ent->referenceShader );
-	common->WriteDemo()->WriteInt( ( int& )ent->customSkin );
-	common->WriteDemo()->WriteInt( ( int& )ent->referenceSound );
+	common->WriteDemo()->WriteFakePtr( ent->customShader );
+	common->WriteDemo()->WriteFakePtr( ent->referenceShader );
+	common->WriteDemo()->WriteFakePtr( ent->customSkin );
+	common->WriteDemo()->WriteFakePtr( ent->referenceSound );
 	for( int i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ )
 		common->WriteDemo()->WriteFloat( ent->shaderParms[i] );
 	for( int i = 0; i < MAX_RENDERENTITY_GUI; i++ )
-		common->WriteDemo()->WriteInt( ( int& )ent->gui[i] );
-	common->WriteDemo()->WriteInt( ( int& )ent->remoteRenderView );
+		common->WriteDemo()->WriteFakePtr( ent->gui[i] );
+	// DG: don't save remoteRenderView, it's not restored properly anyway
 	common->WriteDemo()->WriteInt( ent->numJoints );
-	common->WriteDemo()->WriteInt( ( int& )ent->joints );
+	// DG: no reason to store/read ent.joints, they're replaced below anyway
 	common->WriteDemo()->WriteFloat( ent->modelDepthHack );
 	common->WriteDemo()->WriteBool( ent->noSelfShadow );
 	common->WriteDemo()->WriteBool( ent->noShadow );
@@ -697,41 +706,45 @@ void	idRenderWorldLocal::ReadRenderEntity()
 		common->Error( "ReadRenderEntity: index < 0" );
 	}
 	
-	common->ReadDemo()->ReadInt( ( int& )ent.hModel );
+	// DG: replaced ReadInt() hackery with pointers with ReadFakePtr()
+	common->ReadDemo()->ReadFakePtr( ent.hModel );
 	common->ReadDemo()->ReadInt( ent.entityNum );
 	common->ReadDemo()->ReadInt( ent.bodyId );
 	common->ReadDemo()->ReadVec3( ent.bounds[0] );
 	common->ReadDemo()->ReadVec3( ent.bounds[1] );
-	common->ReadDemo()->ReadInt( ( int& )ent.callback );
-	common->ReadDemo()->ReadInt( ( int& )ent.callbackData );
+	// DG: the following were set to NULL anyway, so why bother to save/restore them..
+	ent.callback = NULL;
+	ent.callbackData = NULL;
 	common->ReadDemo()->ReadInt( ent.suppressSurfaceInViewID );
 	common->ReadDemo()->ReadInt( ent.suppressShadowInViewID );
 	common->ReadDemo()->ReadInt( ent.suppressShadowInLightID );
 	common->ReadDemo()->ReadInt( ent.allowSurfaceInViewID );
 	common->ReadDemo()->ReadVec3( ent.origin );
 	common->ReadDemo()->ReadMat3( ent.axis );
-	common->ReadDemo()->ReadInt( ( int& )ent.customShader );
-	common->ReadDemo()->ReadInt( ( int& )ent.referenceShader );
-	common->ReadDemo()->ReadInt( ( int& )ent.customSkin );
-	common->ReadDemo()->ReadInt( ( int& )ent.referenceSound );
+	common->ReadDemo()->ReadFakePtr( ent.customShader );
+	common->ReadDemo()->ReadFakePtr( ent.referenceShader );
+	common->ReadDemo()->ReadFakePtr( ent.customSkin );
+	common->ReadDemo()->ReadFakePtr( ent.referenceSound );
 	for( i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ )
 	{
 		common->ReadDemo()->ReadFloat( ent.shaderParms[i] );
 	}
 	for( i = 0; i < MAX_RENDERENTITY_GUI; i++ )
 	{
-		common->ReadDemo()->ReadInt( ( int& )ent.gui[i] );
+		common->ReadDemo()->ReadFakePtr( ent.gui[i] );
 	}
-	common->ReadDemo()->ReadInt( ( int& )ent.remoteRenderView );
+	// DG: don't save/restore remoteRenderView, just set it to NULL
+	//     because the pointer wouldn't be valid anyway
+	ent.remoteRenderView = NULL;
 	common->ReadDemo()->ReadInt( ent.numJoints );
-	common->ReadDemo()->ReadInt( ( int& )ent.joints );
+	// DG: no reason to store/read ent.joints, they're replaced below anyway
 	common->ReadDemo()->ReadFloat( ent.modelDepthHack );
 	common->ReadDemo()->ReadBool( ent.noSelfShadow );
 	common->ReadDemo()->ReadBool( ent.noShadow );
 	common->ReadDemo()->ReadBool( ent.noDynamicInteractions );
 	common->ReadDemo()->ReadBool( ent.weaponDepthHack );
 	common->ReadDemo()->ReadInt( ent.forceUpdate );
-	ent.callback = NULL;
+	
 	if( ent.customShader )
 	{
 		ent.customShader = declManager->FindMaterial( common->ReadDemo()->ReadHashString() );
@@ -768,7 +781,7 @@ void	idRenderWorldLocal::ReadRenderEntity()
 		SIMD_INIT_LAST_JOINT( ent.joints, ent.numJoints );
 	}
 	
-	ent.callbackData = NULL;
+	
 	
 	/*
 	if ( ent.decals ) {

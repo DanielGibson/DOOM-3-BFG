@@ -234,6 +234,9 @@ void idCommonLocal::TimeRenderDemo( const char* demoName, bool twice, bool quit 
 {
 	idStr demo = demoName;
 	
+	// timedemos have no sound
+	soundSystem->SetMute( true );
+	
 	StartPlayingRenderDemo( demo );
 	
 	if( twice && readDemo )

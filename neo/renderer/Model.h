@@ -139,10 +139,17 @@ enum dynamicModel_t
 	DM_CONTINUOUS	// must be recreated for every single view (time dependent things like particles)
 };
 
+#if 0
 enum jointHandle_t
 {
 	INVALID_JOINT				= -1
 };
+#else
+// abusing enums like this is bad :-/
+typedef int jointHandle_t;
+#define INVALID_JOINT -1
+#endif
+
 
 class idMD5Joint
 {

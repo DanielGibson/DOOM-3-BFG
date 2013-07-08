@@ -47,7 +47,6 @@ typedef enum
 
 class idFileSystemLocal;
 
-
 class idFile
 {
 public:
@@ -112,6 +111,56 @@ public:
 	virtual int				WriteVec4( const idVec4& vec );
 	virtual int				WriteVec6( const idVec6& vec );
 	virtual int				WriteMat3( const idMat3& mat );
+	
+	/*
+	================================================
+	idFile::ReadFakePtr
+	
+	Sometimes (in demos) we just want to store the fact that a pointer was
+	or was not NULL (some other magic with HashStrings is done for the data pointed to)
+	
+	Note that this function does *not* set ptr to a valid destination - it just gets
+	values suitable for checking for NULL.
+	So if ptr != NULL after calling ReadFakePtr, you still have to point it to
+	real data (probably using blaManager->FindBla(file->ReadHashString());
+	see idRenderWorldLocal::ReadRenderLight() etc for examples)
+	
+	This used to be done with ReadInt()/WriteInt() and ugly casts to (int&)
+	- but that doesn't really work on 64bit systems (the first 4 bytes may be 0,
+	even if the pointer doesn't point to NULL)
+	
+	Now we use the ReadFakePtr()/WriteFakePtr() for more readability and less bugs.
+	It actually just Reads/Writes a bool for "pointer is (not) NULL"
+	
+	The templates were necessary, because while casting Foo* to void* can be done
+	implicitly in C++, casting Foo** to void** or passing Foo* to void*& can not.
+	================================================
+	*/
+	template<typename T>
+	ID_INLINE int ReadFakePtr( T*& ptr )
+	{
+		bool b;
+		int ret = ReadBool( b );
+		if( b )
+		{
+			// this is no valid pointer, and will never be on sane operating systems.
+			// however, it passes a != NULL check so it's suitable for our needs
+			ptr = ( T* )1;
+		}
+		else
+		{
+			ptr = NULL;
+		}
+		
+		return ret;
+	}
+	
+	// the writing counterpart, see ReadFakePtr() for more info
+	template<typename T>
+	ID_INLINE int WriteFakePtr( T* ptr )
+	{
+		return WriteBool( ptr != NULL );
+	}
 	
 	template<class type> ID_INLINE size_t ReadBig( type& c )
 	{

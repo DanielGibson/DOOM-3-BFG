@@ -228,6 +228,12 @@ void idSaveGame::WriteInt( const int value )
 	file->WriteBig( value );
 }
 
+// FIXME: add some kind of WriteEnum<enum_type>( enum_type value ) and a corresponding read function
+// that cast to/from int to make sure things don't fuck up if sizeof(int) != sizeof(my_enum_type)
+// use  http://www.cplusplus.com/reference/type_traits/is_enum/
+// with http://en.cppreference.com/w/cpp/language/static_assert
+// to check T, if we have C++11
+
 /*
 ================
 idSaveGame::WriteJoint
