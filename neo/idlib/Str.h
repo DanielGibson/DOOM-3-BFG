@@ -4,6 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 Copyright (C) 2012 Robert Beckebans
+Copyright (C) 2013 Daniel Gibson
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
 
@@ -253,12 +254,16 @@ public:
 	idStr				Left( int len ) const;							// return the leftmost 'len' characters
 	idStr				Right( int len ) const;							// return the rightmost 'len' characters
 	idStr				Mid( int start, int len ) const;				// return 'len' characters starting at 'start'
-	void				Format( VERIFY_FORMAT_STRING const char* fmt, ... );					// perform a threadsafe sprintf to the string
+	void				Format( VERIFY_FORMAT_STRING const char* fmt, ... ) // perform a threadsafe sprintf to the string
+	ATTRIBUTE_PRINTF( 2, 3 ); // 2 because of implicit this argument
+	void				VFormat( const char* fmt,  va_list argptr );	// perform a threadsafe vsprintf to the string
 	static idStr		FormatInt( const int num, bool isCash = false );			// formats an integer as a value with commas
 	static idStr		FormatCash( const int num )
 	{
 		return FormatInt( num, true );
 	}
+	static idStr 		VA( VERIFY_FORMAT_STRING const char* fmt, ... ) ATTRIBUTE_PRINTF( 1, 2 );
+	
 	void				StripLeading( const char c );					// strip char from front as many times as the char occurs
 	void				StripLeading( const char* string );				// strip string from front as many times as the string occurs
 	bool				StripLeadingOnce( const char* string );			// strip string from front just once if it occurs
@@ -310,7 +315,8 @@ public:
 	static int			IcmpnPath( const char* s1, const char* s2, int n );	// compares paths and makes sure folders come first
 	static void			Append( char* dest, int size, const char* src );
 	static void			Copynz( char* dest, const char* src, int destsize );
-	static int			snPrintf( char* dest, int size, VERIFY_FORMAT_STRING const char* fmt, ... );
+	static int			snPrintf( char* dest, int size, VERIFY_FORMAT_STRING const char* fmt, ... )
+	ATTRIBUTE_PRINTF( 3, 4 );
 	static int			vsnPrintf( char* dest, int size, const char* fmt, va_list argptr );
 	static int			FindChar( const char* str, const char c, int start = 0, int end = -1 );
 	static int			FindText( const char* str, const char* text, bool casesensitive = true, int start = 0, int end = -1 );
@@ -340,7 +346,8 @@ public:
 	static int			ColorIndex( int c );
 	static idVec4& 		ColorForIndex( int i );
 	
-	friend int			sprintf( idStr& dest, const char* fmt, ... );
+	friend int			sprintf( idStr& dest, VERIFY_FORMAT_STRING const char* fmt, ... )
+	ATTRIBUTE_PRINTF( 2, 3 );
 	friend int			vsprintf( idStr& dest, const char* fmt, va_list ap );
 	
 	void				ReAllocate( int amount, bool keepold );				// reallocate string data buffer

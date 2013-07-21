@@ -215,11 +215,14 @@ bulk of the codebase, so it is the best place for analyze pragmas.
 // DG: alternative for GCC with attribute (NOOP for MSVC)
 #define ATTRIBUTE_PRINTF(STRIDX, FIRSTARGIDX)
 
-#elif defined(__GNUC__) // FIXME: what about clang?
+#elif defined(__GNUC__) // this also covers clang...
 #define	VERIFY_FORMAT_STRING
 // STRIDX: index of format string in function arguments (first arg == 1)
 // FIRSTARGIDX: index of first argument for the format string
 #define ATTRIBUTE_PRINTF(STRIDX, FIRSTARGIDX) __attribute__ ((format (printf, STRIDX, FIRSTARGIDX)))
+#else // whatever compiler this may be..
+#define	VERIFY_FORMAT_STRING
+#define ATTRIBUTE_PRINTF(STRIDX, FIRSTARGIDX)
 // DG end
 #endif // _MSC_VER
 

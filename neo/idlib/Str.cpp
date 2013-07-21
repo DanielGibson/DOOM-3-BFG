@@ -4,6 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 Copyright (C) 2012 Robert Beckebans
+Copyright (C) 2013 Daniel Gibson
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
 
@@ -719,11 +720,24 @@ perform a threadsafe sprintf to the string
 void idStr::Format( const char* fmt, ... )
 {
 	va_list argptr;
+	va_start( argptr, fmt );
+	VFormat( fmt, argptr );
+	va_end( argptr );
+}
+
+/*
+========================
+idStr::VFormat
+
+perform a threadsafe vsprintf to the string
+========================
+*/
+void idStr::VFormat( const char* fmt,  va_list argptr )
+{
 	char text[MAX_PRINT_MSG];
 	
-	va_start( argptr, fmt );
 	int len = idStr::vsnPrintf( text, sizeof( text ) - 1, fmt, argptr );
-	va_end( argptr );
+	
 	text[ sizeof( text ) - 1 ] = '\0';
 	
 	if( ( size_t )len >= sizeof( text ) - 1 )
@@ -759,6 +773,26 @@ idStr idStr::FormatInt( const int num, bool isCash )
 	}
 	
 	return val;
+}
+
+/*
+========================
+idStr::VA
+
+A threadsafe alternative for va, returning an idStr
+
+Returns an idStr formatted as described in fmt and args (in printf-like syntax)
+========================
+*/
+idStr idStr::VA( const char* fmt, ... )
+{
+	idStr s;
+	va_list argptr;
+	va_start( argptr, fmt );
+	s.VFormat( fmt, argptr );
+	va_end( argptr );
+	
+	return s;
 }
 
 /*
@@ -2347,8 +2381,7 @@ NOTE: not thread safe
 char* va( const char* fmt, ... )
 {
 	va_list argptr;
-	// FIXME: the following should be thread local to make this thread safe
-	// (this function is used *a lot* so it should be)
+	// FIXME: DG: this should be deprecated, use idStr::VA() instead
 	static int index = 0;
 	static char string[4][16384];	// in case called by nested functions
 	char* buf;
