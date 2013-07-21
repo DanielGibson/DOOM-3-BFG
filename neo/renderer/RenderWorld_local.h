@@ -258,6 +258,8 @@ public:
 	void					StopWritingDemo();
 	bool					ProcessDemoCommand( idDemoFile* readDemo, renderView_t* demoRenderView, int* demoTimeOffset );
 	
+	bool 					LoadDemoMap(const char* mapname);
+
 	void					WriteLoadMap();
 	void					WriteRenderView( const renderView_t* renderView );
 	void					WriteVisibleDefs( const viewDef_t* viewDef );

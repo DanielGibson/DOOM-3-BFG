@@ -270,6 +270,11 @@ static void R_AddSingleLight( viewLight_t* vLight )
 	const bool lightCastsShadows = light->LightCastsShadows();
 	idInteraction * * const interactionTableRow = light->world->interactionTable + light->index * light->world->interactionTableWidth;
 	
+	if(interactionTableRow == NULL) {
+		common->Warning("interactionTableRow is NULL!\n");
+		return;
+	}
+
 	for( areaReference_t* lref = light->references; lref != NULL; lref = lref->ownerNext )
 	{
 		portalArea_t* area = lref->area;

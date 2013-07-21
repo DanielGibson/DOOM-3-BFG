@@ -306,7 +306,7 @@ public:
 	
 	// Writing to and reading from a demo file.
 	virtual void				ReadFromDemoFile( class idDemoFile* f ) = 0;
-	virtual void				WriteToDemoFile( class idDemoFile* f ) = 0;
+	// virtual void				WriteToDemoFile( class idDemoFile* f ) = 0; // DG: I think this is never called anyway?
 	
 	// if false, the model doesn't need to be linked into the world, because it
 	// can't contribute visually -- triggers, etc

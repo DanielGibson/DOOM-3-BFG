@@ -907,7 +907,11 @@ void idRenderWorldLocal::RenderScene( const renderView_t* renderView )
 	
 	if( renderView->fov_x <= 0 || renderView->fov_y <= 0 )
 	{
-		common->Error( "idRenderWorld::RenderScene: bad FOVs: %f, %f", renderView->fov_x, renderView->fov_y );
+		common->Warning( "idRenderWorld::RenderScene: bad FOVs: %f, %f", renderView->fov_x, renderView->fov_y );
+		( ( renderView_t* )renderView )->fov_x = 86.012346f; // FIXME: bad hack!!
+		( ( renderView_t* )renderView )->fov_y = 58.715508f; // FIXME: bad hack!!
+		//assert(0);
+		//common->Error( "idRenderWorld::RenderScene: bad FOVs: %f, %f", renderView->fov_x, renderView->fov_y );
 	}
 	
 	// close any gui drawing

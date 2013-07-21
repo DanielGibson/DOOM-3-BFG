@@ -850,6 +850,9 @@ bool idRenderWorldLocal::InitFromMap( const char* name )
 	static const byte BPROC_VERSION = 1;
 	static const unsigned int BPROC_MAGIC = ( 'P' << 24 ) | ( 'R' << 16 ) | ( 'O' << 8 ) | BPROC_VERSION;
 	bool loaded = false;
+	// FIXME: for some reason, the .resources file for the map isn't loaded,
+	// so generatedFileName can't be found in it
+	// see idCommonLocal::ExecuteMapChange() maybe?
 	idFileLocal file( fileSystem->OpenFileReadMemory( generatedFileName ) );
 	if( file != NULL )
 	{

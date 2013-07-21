@@ -86,6 +86,35 @@ void idRenderWorldLocal::StopWritingDemo()
 //	writeDemo = NULL;
 }
 
+bool idRenderWorldLocal::LoadDemoMap(const char* mapname)
+{
+	// TODO: maybe map loading from mapname could be unified here, in load savegame, in start map, etc?
+
+	if( fileSystem->UsingResourceFiles() )
+	{
+		// each map has its own .resources file - load it
+		idStrStatic< MAX_OSPATH > currentMapName = mapname;
+		currentMapName.StripFileExtension();
+		idStrStatic< MAX_OSPATH > manifestName = currentMapName;
+		manifestName.Replace( "game/", "maps/" );
+		manifestName.Replace( "maps/maps/", "maps/" );
+		manifestName.Replace( "/mp/", "/" );
+		manifestName += ".preload";
+		common->Printf("## manifestName: %s currentMapName: %s\n", manifestName.c_str(), currentMapName.c_str());
+		idPreloadManifest manifest;
+		manifest.LoadManifest( manifestName );
+		renderSystem->Preload( manifest, currentMapName );
+		common->Printf("## Finished preloading renderstuff\n");
+		soundSystem->Preload( manifest );
+		game->Preload( manifest );
+	}
+
+	if( !InitFromMap( mapname ) )
+	{
+		common->Warning( "DC_LOADMAP: InitFromMap(%s) failed!\n", mapname );
+	}
+}
+
 /*
 ==============
 ProcessDemoCommand
@@ -109,6 +138,8 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile* readDemo, renderView_t
 		return false;
 	}
 	
+	// common->Printf( "ProcessDemoCommand: %d\n",  dc );
+	
 	switch( dc )
 	{
 		case DC_LOADMAP:
@@ -130,13 +161,15 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile* readDemo, renderView_t
 			{
 				common->Printf( "DC_LOADMAP: %s\n", header.mapname );
 			}
-			InitFromMap( header.mapname );
+
+			LoadDemoMap(header.mapname); // TODO: handle return value
 			
 			newMap = true;		// we will need to set demoTimeOffset
 			
 			break;
 			
 		case DC_RENDERVIEW:
+			// idLib::Printf( "### idRenderWorldLocal::ProcessDemoCommand() DC_RENDERVIEW\n" );
 			readDemo->ReadInt( renderView->viewID );
 			readDemo->ReadFloat( renderView->fov_x );
 			readDemo->ReadFloat( renderView->fov_y );
@@ -144,23 +177,21 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile* readDemo, renderView_t
 			readDemo->ReadMat3( renderView->viewaxis );
 			readDemo->ReadBool( renderView->cramZNear );
 			readDemo->ReadBool( renderView->forceUpdate );
-			// binary compatibility with win32 padded structures
-			char tmp;
-			readDemo->ReadChar( tmp );
-			readDemo->ReadChar( tmp );
 			readDemo->ReadInt( renderView->time[1] );
 			for( int i = 0; i < MAX_GLOBAL_SHADER_PARMS; i++ )
 				readDemo->ReadFloat( renderView->shaderParms[i] );
 				
 			if( !readDemo->ReadFakePtr( renderView->globalMaterial ) )
 			{
+				// DG: whatever strange kind of case this is supposed to handle...
 				renderView->globalMaterial = NULL;
 				return false;
 			}
 			
 			// make sure it doesn't point into the void
 			renderView->globalMaterial = NULL;
-
+			//renderView->globalMaterial = (idMaterial*)1;// NULL; // FIXME
+			
 			if( r_showDemo.GetBool() )
 			{
 				common->Printf( "DC_RENDERVIEW: %i\n", renderView->time );
@@ -215,10 +246,10 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile* readDemo, renderView_t
 			{
 				common->Printf( "DC_CROP_RENDER\n" );
 			}
-			int	size[3];
+			int	size[2];
 			readDemo->ReadInt( size[0] );
 			readDemo->ReadInt( size[1] );
-			readDemo->ReadInt( size[2] );
+			// readDemo->ReadInt( size[2] ); it only wrote width and height - right?
 			renderSystem->CropRenderSize( size[0], size[1] );
 			break;
 			
@@ -375,6 +406,8 @@ void	idRenderWorldLocal::WriteRenderView( const renderView_t* renderView )
 		return;
 	}
 	
+	assert( renderView->fov_x > 0.0f && renderView->fov_y > 0.0f );
+	
 	// write the actual view command
 	common->WriteDemo()->WriteInt( DS_RENDER );
 	common->WriteDemo()->WriteInt( DC_RENDERVIEW );
@@ -385,9 +418,6 @@ void	idRenderWorldLocal::WriteRenderView( const renderView_t* renderView )
 	common->WriteDemo()->WriteMat3( renderView->viewaxis );
 	common->WriteDemo()->WriteBool( renderView->cramZNear );
 	common->WriteDemo()->WriteBool( renderView->forceUpdate );
-	// binary compatibility with old win32 version writing padded structures directly to disk
-	common->WriteDemo()->WriteUnsignedChar( 0 );
-	common->WriteDemo()->WriteUnsignedChar( 0 );
 	common->WriteDemo()->WriteInt( renderView->time[1] );
 	for( i = 0; i < MAX_GLOBAL_SHADER_PARMS; i++ )
 		common->WriteDemo()->WriteFloat( renderView->shaderParms[i] );
@@ -779,6 +809,8 @@ void	idRenderWorldLocal::ReadRenderEntity()
 			}
 		}
 		SIMD_INIT_LAST_JOINT( ent.joints, ent.numJoints );
+	} else {
+		ent.joints = NULL;
 	}
 	
 	

@@ -766,6 +766,14 @@ void idRenderSystemLocal::SwapCommandBuffers_FinishRendering(
 	// print any other statistics and clear all of them
 	R_PerformanceCounters();
 	
+	if( common->WriteDemo() )
+	{
+		common->WriteDemo()->WriteInt( DS_RENDER );
+		common->WriteDemo()->WriteInt( DC_END_FRAME );
+		if( r_showDemo.GetBool() )
+			common->Printf( "write DC_END_FRAME\n" );
+	}
+	
 	// check for dynamic changes that require some initialization
 	R_CheckCvars();
 	

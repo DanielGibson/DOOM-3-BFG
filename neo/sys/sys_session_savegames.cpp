@@ -364,6 +364,7 @@ saveGameHandle_t idSessionLocal::LoadGameSync( const char* name, saveFileEntryLi
 		//idScopedGlobalHeap everythingGoesInTheGlobalHeap;
 		
 		// Done this way so we know it will be shutdown properly on early exit or exception
+		// TODO: if this turns out to be a common pattern, try to use a template or something
 		struct local_t
 		{
 			local_t( idSaveLoadParms* parms_ ) : parms( parms_ )

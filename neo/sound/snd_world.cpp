@@ -119,6 +119,14 @@ idSoundEmitter* idSoundWorldLocal::AllocSoundEmitter()
 {
 	idSoundEmitterLocal* emitter = emitterAllocator.Alloc();
 	emitter->Init( emitters.Append( emitter ), this );
+	
+	if( writeDemo )
+	{
+		writeDemo->WriteInt( DS_SOUND );
+		writeDemo->WriteInt( SCMD_ALLOC_EMITTER );
+		writeDemo->WriteInt( emitter->index );
+	}
+	
 	return emitter;
 }
 

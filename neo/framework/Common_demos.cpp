@@ -214,13 +214,14 @@ void idCommonLocal::StartPlayingRenderDemo( idStr demoName )
 		StartMenu();
 		return;
 	}
+	/* FIXME: really?
+		const bool captureToImage = false;
+		UpdateScreen( captureToImage ); // FIXME: does removing this really help/work?
 	
-	const bool captureToImage = false;
-	UpdateScreen( captureToImage );
-	
-	AdvanceRenderDemo( true );
-	
-	numDemoFrames = 1;
+		AdvanceRenderDemo( true );
+	*/
+	// numDemoFrames = 1;
+	numDemoFrames = 0; // FIXME: ???
 	
 	timeDemoStartTime = Sys_Milliseconds();
 }
@@ -233,7 +234,31 @@ idCommonLocal::TimeRenderDemo
 void idCommonLocal::TimeRenderDemo( const char* demoName, bool twice, bool quit )
 {
 	idStr demo = demoName;
+	bool finished = false;
 	
+	StartPlayingRenderDemo( demo );
+	
+	while( readDemo && !finished )
+	{
+		finished = AdvanceRenderDemo( true ); // the argument isn't used anyway
+	}
+	
+	if( quit )
+	{
+		// this allows hardware vendors to automate some testing
+		timeDemo = TD_YES_THEN_QUIT;
+	}
+	else
+	{
+		timeDemo = TD_YES;
+	}
+	
+	StopPlayingRenderDemo();
+	
+	Stop();
+	StartMenu();
+	
+#if 0
 	// timedemos have no sound
 	soundSystem->SetMute( true );
 	
@@ -266,6 +291,7 @@ void idCommonLocal::TimeRenderDemo( const char* demoName, bool twice, bool quit 
 	{
 		timeDemo = TD_YES;
 	}
+#endif
 }
 
 
@@ -429,10 +455,12 @@ void idCommonLocal::CompressDemoFile( const char* scheme, const char* demoName )
 idCommonLocal::AdvanceRenderDemo
 ===============
 */
-void idCommonLocal::AdvanceRenderDemo( bool singleFrameOnly )
+bool idCommonLocal::AdvanceRenderDemo( bool singleFrameOnly )
 {
 	int	ds = DS_FINISHED;
 	readDemo->ReadInt( ds );
+	
+	// common->Printf( "AdvanceRenderDemo: %d\n", ds );
 	
 	switch( ds )
 	{
@@ -444,20 +472,28 @@ void idCommonLocal::AdvanceRenderDemo( bool singleFrameOnly )
 				Stop();
 				StartMenu();
 			}
-			return;
+			return true;
 		case DS_RENDER:
 			if( renderWorld->ProcessDemoCommand( readDemo, &currentDemoRenderView, &demoTimeOffset ) )
 			{
 				// a view is ready to render
-				numDemoFrames++;
+				if(numDemoFrames++ > 0) // FIXME: maybe the first frame is corrupt, in that case skip it here
+					UpdateScreen( false );
 			}
 			break;
 		case DS_SOUND:
 			soundWorld->ProcessDemoCommand( readDemo );
 			break;
+		case DS_VERSION:
+			// discard result.
+			int tmp;
+			readDemo->ReadInt( tmp );
+			break;
 		default:
 			common->Error( "Bad render demo token" );
+			return true;
 	}
+	return false;
 }
 
 /*

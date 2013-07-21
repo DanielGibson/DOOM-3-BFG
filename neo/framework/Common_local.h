@@ -560,7 +560,7 @@ private:
 	void	BeginAVICapture( const char* name );
 	void	EndAVICapture();
 	
-	void	AdvanceRenderDemo( bool singleFrameOnly );
+	bool	AdvanceRenderDemo( bool singleFrameOnly );
 	
 	void	ProcessGameReturn( const gameReturn_t& ret );
 	
