@@ -110,3 +110,60 @@ char* Mem_CopyString( const char* in )
 	return out;
 }
 
+
+// DG: overloads for new and delete shouldn't be inline
+//     (compilers, incl. VS2017, complain - and it just makes no sense)
+
+void* operator new( size_t s )
+#if !defined(_MSC_VER)
+throw( std::bad_alloc ) // DG: standard signature seems to include throw(..)
+#endif
+{
+	return Mem_Alloc( s, TAG_NEW );
+}
+
+void operator delete( void* p )
+#if !defined(_MSC_VER)
+throw() // DG: delete musn't throw
+#endif
+{
+	Mem_Free( p );
+}
+void* operator new[]( size_t s )
+#if !defined(_MSC_VER)
+throw( std::bad_alloc ) // DG: standard signature seems to include throw(..)
+#endif
+{
+	return Mem_Alloc( s, TAG_NEW );
+}
+
+void operator delete[]( void* p )
+#if !defined(_MSC_VER)
+throw() // DG: delete musn't throw
+#endif
+{
+	Mem_Free( p );
+}
+
+void* operator new( size_t s, memTag_t tag )
+{
+	return Mem_Alloc( s, tag );
+}
+
+void operator delete( void* p, memTag_t tag )
+#if !defined(_MSC_VER)
+throw() // DG: delete musn't throw
+#endif
+{
+	Mem_Free( p );
+}
+
+void* operator new[]( size_t s, memTag_t tag )
+{
+	return Mem_Alloc( s, tag );
+}
+
+void operator delete[]( void* p, memTag_t tag ) throw() // DG: delete musn't throw
+{
+	Mem_Free( p );
+}
