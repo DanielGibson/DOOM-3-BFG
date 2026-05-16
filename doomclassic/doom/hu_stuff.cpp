@@ -319,7 +319,7 @@ void HU_Init(void)
 
 	int		i;
 	int		j;
-	char	buffer[9];
+	char	buffer[20];
 
 	shiftxform = english_shiftxform;
 
