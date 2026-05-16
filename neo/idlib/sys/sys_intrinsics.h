@@ -29,7 +29,10 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __SYS_INTRIINSICS_H__
 #define __SYS_INTRIINSICS_H__
 
-#define USE_INTRINSICS
+#if defined(_M_AMD64) || defined(__x86_64__) || defined(_M_IX86) || defined(_X86_) \
+    || defined(__i386__) || defined(__i686__)
+  #define USE_INTRINSICS
+#endif
 
 #if defined(USE_INTRINSICS)
 #include <emmintrin.h>
