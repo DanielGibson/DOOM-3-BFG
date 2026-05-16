@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 project(RBDoom3BFG)
@@ -10,13 +10,15 @@ option(MONOLITH
 		"Embed game logic into main executable" ON)
 		
 option(SDL2
-		"Use SDL2 instead of SDL1.2" OFF)
+		"Use SDL2 instead of SDL1.2" ON)
 		
 option(OPENAL
 		"Use OpenAL soft instead of XAudio2" OFF)
 
 option(FFMPEG
-		"Use FMPEG to render Bink videos" ON)
+		"Use FMPEG to render Bink videos" OFF)
+
+option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored compiler warnings/errors (GCC/Clang only; esp. useful with ninja)." OFF)
 
 if(UNIX)
 	set(OPENAL TRUE)
@@ -38,11 +40,17 @@ else()
 	message(STATUS CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE})
 endif()
 
+# DG: doesn't compile in C++17 mode
+set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	add_definitions(-pipe)
 	#add_definitions(-Wall)
 	add_definitions(-Werror=format-security)
 	add_definitions(-Werror=format)
+	# stop bitching about std::auto_ptr
+	add_definitions(-Wno-deprecated-declarations)
 	add_definitions(-mmmx -msse -msse2)
 	if(WIN32)
 		# require msvcr70.dll or newer for _aligned_malloc etc
@@ -54,6 +62,14 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 		include_directories(${DirectX_INCLUDE_DIR})
 		add_definitions(-DUSE_XINPUT)
 	endif()	
+	
+	if(FORCE_COLORED_OUTPUT)
+		if(CMAKE_COMPILER_IS_GNUCC)
+		   add_compile_options (-fdiagnostics-color=always)
+		else() # assume clang
+		   add_compile_options (-fcolor-diagnostics)
+		endif ()
+	endif ()
 	
 	#if(NOT ANDROID)
 		add_definitions(-DUSE_EXCEPTIONS)
@@ -1410,7 +1426,7 @@ else()
 	# (i.e. can't use the one created for idlib before)
 	# because some definitions (e.g. -D__IDLIB__ -D__DOOM_DLL__) differ
 	add_custom_target(precomp_header_rbdoom3bfg ALL
-	                  COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -x c++-header idlib/precompiled.h -o idlib/precompiled.h.gch
+	                  COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -std=gnu++14 -Wno-deprecated-declarations -x c++-header idlib/precompiled.h -o idlib/precompiled.h.gch 
 	                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	                  COMMENT "Creating idlib/precompiled.h.gch for RBDoom3BFG"
 	                  )

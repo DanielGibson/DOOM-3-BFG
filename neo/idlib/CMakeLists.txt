@@ -128,7 +128,7 @@ else()
 	SEPARATE_ARGUMENTS(_compiler_FLAGS)
 	
 	add_custom_target(precomp_header_idlib ALL
-	                  COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -x c++-header precompiled.h -o precompiled.h.gch
+	                  COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -std=gnu++14 -Wno-deprecated-declarations -x c++-header precompiled.h -o precompiled.h.gch
 	                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	                  COMMENT "Creating idlib/precompiled.h.gch for idlib"
 	                  )
